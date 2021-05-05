@@ -1,0 +1,3 @@
+rootProject.name='BaseExample'
+include ':app'
+include ':app_baselibrary'
