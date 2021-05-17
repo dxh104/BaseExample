@@ -3,6 +3,7 @@ package com.dxh.base_library_module.base;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Build;
@@ -257,4 +258,49 @@ public abstract class BaseAbstractActivity extends RxAppCompatActivity implement
         ToastUtil.showShort(mContext, e.getMessage());
         hideLoadingDialog();
     }
+
+
+    public void openActivity(Intent intent) {
+        startActivity(intent);
+    }
+
+    public void openActivity(Class activity) {
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+    }
+
+    //打开新的activity同一时候移除之前全部的activity
+    public void openActivityAndFinishAll(Class<?> cls) {
+        Intent intent = new Intent(this, cls);
+        //新活动成为新任务的根，旧的活动都被结束了
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    //跳转并关闭当前页面
+    public void openActivityAndFinish(Class activity) {
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+        finish();
+    }
+
+    //清除栈顶目标activity包括上方activity，再重新打开目标activity 重走生命周期
+    //从下往上(目标activity上方)依次销毁activity（除当前activity），再销毁Class(目标activity),再创建Class(目标activity)，最后销毁当前activity
+    public void openActivityAndClearTop(Class activity) {
+        Intent intent = new Intent(this, activity);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    //    public void jumpToWebViewActivity(String url) {
+//        Intent intent = new Intent(this, WebViewActivity.class);
+//        intent.putExtra("url", url);
+//        jumpToActivity(intent);
+//    }
+//    public void jumpToWebViewActivity(String url,String title) {
+//        Intent intents = new Intent(this, WebViewActivity.class);
+//        intents.putExtra("url", url);
+//        intents.putExtra("title", title);
+//        jumpToActivity(intents);
+//    }
 }
