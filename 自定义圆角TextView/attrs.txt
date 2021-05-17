@@ -1,0 +1,5 @@
+ <!--圆角TextView-->
+    <declare-styleable name="CornerTextView">
+        <attr name="cornerRadiusSize" format="dimension" /><!--圆角背景大小-->
+        <attr name="cornerColor" format="color" /><!--圆角背景颜色-->
+    </declare-styleable>
