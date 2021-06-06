@@ -8,7 +8,6 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
@@ -36,13 +35,14 @@ import butterknife.Unbinder;
 /**
  * Created by XHD on 2021/05/05
  */
-public abstract class BaseAbstractActivity extends RxAppCompatActivity implements IBaseView {
+public abstract class BaseActivity extends RxAppCompatActivity implements IBaseView {
     //管理所有Activity
     public ActivityManager mActivityManager = ActivityManager.getInstance();
     public Context mContext;
     public LifecycleProvider<ActivityEvent> mProvider;
     private Unbinder bind;
     private ProgressDialog loadingDialog;
+    public String TAG = getClass().getName();
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -266,6 +266,12 @@ public abstract class BaseAbstractActivity extends RxAppCompatActivity implement
 
     public void openActivity(Class activity) {
         Intent intent = new Intent(this, activity);
+        startActivity(intent);
+    }
+
+    public void openActivityAndPutData(Class activity, Bundle bundle) {
+        Intent intent = new Intent(this, activity);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 

@@ -4,7 +4,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.dxh.base_library_module.base.BaseAbstractActivity;
+import com.dxh.base_library_module.base.BaseActivity;
 import com.dxh.base_library_module.bean.CalendarInfo;
 import com.dxh.base_library_module.http.ApiUtil;
 
@@ -12,7 +12,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.observers.DefaultObserver;
 
-public class MainActivity extends BaseAbstractActivity {
+public class MainActivity extends BaseActivity {
     @BindView(R.id.tv_data)
     TextView tvData;
     @BindView(R.id.btn_getData)
