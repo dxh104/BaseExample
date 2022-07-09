@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 /**
  * SharedPreference工具类
  */
-public class SharedPreferenceUtil {
+public class SPUtils {
     private final static String NAME = "privata_data";
 
     @SuppressLint("ApplySharedPref")

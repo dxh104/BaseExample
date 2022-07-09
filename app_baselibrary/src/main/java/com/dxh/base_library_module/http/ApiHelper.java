@@ -24,6 +24,7 @@ import okio.BufferedSource;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 
 public class ApiHelper {
@@ -84,6 +85,7 @@ public class ApiHelper {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constant.SERVICE_URL)
                 .addConverterFactory(GsonConverterFactory.create()) // json解析
+                .addConverterFactory(ScalarsConverterFactory.create()) // 用String来接收返回的信息
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io())) // 支持RxJava
                 .client(httpClient)
                 .build();
