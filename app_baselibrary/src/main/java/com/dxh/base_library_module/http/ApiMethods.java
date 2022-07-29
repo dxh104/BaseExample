@@ -18,6 +18,9 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
+/**
+ * 直接调用
+ */
 public class ApiMethods {
     private static final String TAG = "ApiMethods";
 
@@ -93,20 +96,24 @@ public class ApiMethods {
         }
     }
 
-    public void postRequest(Observer<BaseResult> observer, String url, Map<String, Object> map) {
-        apisubscribe(ApiHelper.getInstance().getRetrofitService().commonPostRequest(url, map), observer);
+    //表单post 响应 字符串传true/实体类传false  map不能为null
+    public <T extends Object> void postRequestMap(Observer<T> observer, String url, Map<String, Object> map, boolean isJsonOrBean) {
+        apisubscribe(ApiHelper.getInstance(isJsonOrBean).getRetrofitService().commonPostRequest(url, map), observer);
     }
 
-    public void postRequest(Observer<BaseResult> observer, String url, RequestBody body) {
-        apisubscribe(ApiHelper.getInstance().getRetrofitService().commonPostRequest(url, body), observer);
+    //json post 响应bean  body不能为null
+    public <T extends Object> void postRequestBean(Observer<T> observer, String url, RequestBody body) {
+        apisubscribe(ApiHelper.getInstance(false).getRetrofitService().commonPostRequest(url, body), observer);
     }
 
+    //json post 响应json  body不能为null
     public void postRequestString(Observer<String> observer, String url, RequestBody body) {
-        apisubscribe(ApiHelper.getInstance().getRetrofitService().commonPostRequest(url, body), observer);
+        apisubscribe(ApiHelper.getInstance(true).getRetrofitService().commonPostRequest(url, body), observer);
     }
 
-    public void getRequest(Observer<BaseResult> observer, String url) {
-        apisubscribe(ApiHelper.getInstance().getRetrofitService().commonGetRequest(url), observer);
+    //url get 响应 字符串(传true)/实体类(传false)
+    public <T extends Object> void getRequest(Observer<T> observer, String url, boolean isJsonOrBean) {
+        apisubscribe(ApiHelper.getInstance(isJsonOrBean).getRetrofitService().commonGetRequest(url), observer);
     }
 
 }

@@ -33,10 +33,14 @@ public class ApiHelper {
     private ApiService apiService;
 
     public static ApiHelper getInstance() {
-        return apiHelper == null ? apiHelper = new ApiHelper() : apiHelper;
+        return apiHelper == null ? apiHelper = new ApiHelper(false) : apiHelper;
     }
 
-    private ApiHelper() {
+    public static ApiHelper getInstance(boolean isJsonFactory) {
+        return new ApiHelper(isJsonFactory);
+    }
+
+    private ApiHelper(boolean isJsonFactory) {
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)//设置连接超时时间
                 .readTimeout(20, TimeUnit.SECONDS)//设置读取超时时间
@@ -84,8 +88,7 @@ public class ApiHelper {
         // 初始化Retrofit
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constant.SERVICE_URL)
-                .addConverterFactory(GsonConverterFactory.create()) // json解析
-                .addConverterFactory(ScalarsConverterFactory.create()) // 用String来接收返回的信息
+                .addConverterFactory(isJsonFactory ? ScalarsConverterFactory.create() : GsonConverterFactory.create()) // 用String来接收返回的信息/json解析
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io())) // 支持RxJava
                 .client(httpClient)
                 .build();
