@@ -3,6 +3,7 @@ package com.dxh.base_library_module.base.viewbinding;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.viewbinding.ViewBinding;
@@ -11,6 +12,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,10 +46,26 @@ public abstract class BaseVbRecycleAdapter<BaseViewBinding extends ViewBinding, 
 
     @Override
     public BaseVbViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        BaseViewBinding mViewBinding = null;
         mContext = parent.getContext();
-        BaseViewBinding binding = getBinding(mContext, viewType);
-        final BaseVbViewHolder baseVbViewHolder = new BaseVbViewHolder(binding);
-        binding.getRoot().setOnClickListener(new View.OnClickListener() {
+        //返回当前类的父类的Type，也就是BaseActivity
+        Type type = getClass().getGenericSuperclass();
+        if (type instanceof ParameterizedType) {//如果支持泛型
+            Class<BaseViewBinding> clazz = (Class<BaseViewBinding>) ((ParameterizedType) type).getActualTypeArguments()[0];
+            try {
+                //反射inflate
+                Method method = clazz.getMethod("inflate", LayoutInflater.class);
+                mViewBinding = (BaseViewBinding) method.invoke(null, LayoutInflater.from(mContext));
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        final BaseVbViewHolder baseVbViewHolder = new BaseVbViewHolder(mViewBinding);
+        mViewBinding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (onItemClickListner != null)
@@ -128,13 +149,6 @@ public abstract class BaseVbRecycleAdapter<BaseViewBinding extends ViewBinding, 
      * @return
      */
     protected abstract int setItemViewType(List<T> mDatas, int position);
-
-    /**
-     * 获取item
-     *
-     * @return
-     */
-    protected abstract BaseViewBinding getBinding(Context context, int viewType);
 
     /**
      * 设置监听事件

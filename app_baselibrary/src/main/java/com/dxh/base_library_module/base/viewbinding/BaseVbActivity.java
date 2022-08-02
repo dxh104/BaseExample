@@ -31,6 +31,11 @@ import com.trello.rxlifecycle2.LifecycleProvider;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -61,7 +66,22 @@ public abstract class BaseVbActivity<BaseViewBinding extends ViewBinding> extend
         if (isHideTitleBar()) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);//Activity去标题栏
         }
-        mViewBinding = createViewBinding();
+        //返回当前类的父类的Type，也就是BaseActivity
+        Type type = getClass().getGenericSuperclass();
+        if (type instanceof ParameterizedType) {//如果支持泛型
+            Class<BaseViewBinding> clazz = (Class<BaseViewBinding>) ((ParameterizedType) type).getActualTypeArguments()[0];
+            try {
+                //反射inflate
+                Method method = clazz.getMethod("inflate", LayoutInflater.class);
+                mViewBinding = (BaseViewBinding) method.invoke(null, getLayoutInflater());
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
         if (mViewBinding != null) {//使用ViewBinding设置布局
             setContentView(mViewBinding.getRoot());
         } else {
@@ -97,8 +117,6 @@ public abstract class BaseVbActivity<BaseViewBinding extends ViewBinding> extend
         super.onDestroy();
     }
 
-
-    protected abstract BaseViewBinding createViewBinding();//创建ViewBinding
 
     /**
      * 设置布局资源
