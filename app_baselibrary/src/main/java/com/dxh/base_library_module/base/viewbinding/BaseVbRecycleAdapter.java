@@ -48,22 +48,7 @@ public abstract class BaseVbRecycleAdapter<BaseViewBinding extends ViewBinding, 
     public BaseVbViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         BaseViewBinding mViewBinding = null;
         mContext = parent.getContext();
-        //返回当前类的父类的Type，也就是BaseActivity
-        Type type = getClass().getGenericSuperclass();
-        if (type instanceof ParameterizedType) {//如果支持泛型
-            Class<BaseViewBinding> clazz = (Class<BaseViewBinding>) ((ParameterizedType) type).getActualTypeArguments()[0];
-            try {
-                //反射inflate
-                Method method = clazz.getMethod("inflate", LayoutInflater.class);
-                mViewBinding = (BaseViewBinding) method.invoke(null, LayoutInflater.from(mContext));
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
+        mViewBinding = createViewBinding(mContext);
         final BaseVbViewHolder baseVbViewHolder = new BaseVbViewHolder(mViewBinding);
         mViewBinding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +59,28 @@ public abstract class BaseVbRecycleAdapter<BaseViewBinding extends ViewBinding, 
         });
         setListener(baseVbViewHolder, (BaseViewBinding) baseVbViewHolder.getBinding(), mDatas);//------设置监听器------
         return baseVbViewHolder;
+    }
+
+    protected BaseViewBinding createViewBinding(Context context) {
+        BaseViewBinding viewBinding = null;
+        //返回当前类的父类的Type
+        Type type = getClass().getGenericSuperclass();
+        if (type instanceof ParameterizedType) {//如果支持泛型
+            Class<BaseViewBinding> clazz = (Class<BaseViewBinding>) ((ParameterizedType) type).getActualTypeArguments()[0];
+            try {
+                //反射inflate
+                Method method = clazz.getMethod("inflate", LayoutInflater.class);
+                method.setAccessible(true);//是否屏蔽Java语言的访问检查
+                viewBinding = (BaseViewBinding) method.invoke(null, LayoutInflater.from(context));
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        return viewBinding;
     }
 
     @Override

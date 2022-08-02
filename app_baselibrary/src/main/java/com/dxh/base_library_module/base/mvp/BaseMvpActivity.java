@@ -30,6 +30,9 @@ import com.trello.rxlifecycle2.LifecycleProvider;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -105,7 +108,21 @@ public abstract class BaseMvpActivity<Presenter extends BaseMvpPresenter> extend
      *
      * @return
      */
-    protected abstract Presenter createPresenter();
+    protected Presenter createPresenter() {
+        Presenter presenter = null;
+        //返回当前类的父类的Type
+        Type type = getClass().getGenericSuperclass();
+        if (type instanceof ParameterizedType) {//如果支持泛型
+            Class<Presenter> clazz = (Class<Presenter>) ((ParameterizedType) type).getActualTypeArguments()[0];
+            try {
+                //反射inflate
+                presenter = clazz.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return presenter;
+    }
 
     /**
      * 设置布局资源

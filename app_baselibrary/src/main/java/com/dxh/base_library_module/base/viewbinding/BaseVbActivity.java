@@ -66,22 +66,7 @@ public abstract class BaseVbActivity<BaseViewBinding extends ViewBinding> extend
         if (isHideTitleBar()) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);//Activity去标题栏
         }
-        //返回当前类的父类的Type，也就是BaseActivity
-        Type type = getClass().getGenericSuperclass();
-        if (type instanceof ParameterizedType) {//如果支持泛型
-            Class<BaseViewBinding> clazz = (Class<BaseViewBinding>) ((ParameterizedType) type).getActualTypeArguments()[0];
-            try {
-                //反射inflate
-                Method method = clazz.getMethod("inflate", LayoutInflater.class);
-                mViewBinding = (BaseViewBinding) method.invoke(null, getLayoutInflater());
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
+        mViewBinding = createViewBinding();
         if (mViewBinding != null) {//使用ViewBinding设置布局
             setContentView(mViewBinding.getRoot());
         } else {
@@ -117,6 +102,28 @@ public abstract class BaseVbActivity<BaseViewBinding extends ViewBinding> extend
         super.onDestroy();
     }
 
+
+    protected BaseViewBinding createViewBinding() {
+        BaseViewBinding viewBinding = null;
+        //返回当前类的父类的Type
+        Type type = getClass().getGenericSuperclass();
+        if (type instanceof ParameterizedType) {//如果支持泛型
+            Class<BaseViewBinding> clazz = (Class<BaseViewBinding>) ((ParameterizedType) type).getActualTypeArguments()[0];
+            try {
+                //反射inflate
+                Method method = clazz.getMethod("inflate", LayoutInflater.class);
+                method.setAccessible(true);//是否屏蔽Java语言的访问检查
+                viewBinding = (BaseViewBinding) method.invoke(null, getLayoutInflater());
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        return viewBinding;
+    }
 
     /**
      * 设置布局资源

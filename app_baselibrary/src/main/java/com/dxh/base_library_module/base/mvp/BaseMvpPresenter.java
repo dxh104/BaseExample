@@ -6,6 +6,9 @@ import android.os.Looper;
 
 import com.dxh.base_library_module.base.IBaseView;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 /*
  * Create by XHD on 2022/07/29
  * Description:逻辑层基类
@@ -22,7 +25,8 @@ public abstract class BaseMvpPresenter<Model extends BaseMvpModel, IView extends
         }
         if (mModel == null) {
             mModel = createModel();
-            mModel.attach(context);
+            if (mModel != null)
+                mModel.attach(context);
         }
         if (mView == null) {
             mView = view;
@@ -48,7 +52,22 @@ public abstract class BaseMvpPresenter<Model extends BaseMvpModel, IView extends
         }
     }
 
-    public abstract Model createModel();//实现model
+    //子类不需要可以重写
+    public Model createModel() {
+        Model model = null;
+        //返回当前类的父类的Type
+        Type type = getClass().getGenericSuperclass();
+        if (type instanceof ParameterizedType) {//如果支持泛型
+            Class<Model> clazz = (Class<Model>) ((ParameterizedType) type).getActualTypeArguments()[0];
+            try {
+                //反射inflate
+                model = clazz.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return model;
+    }
 
     public abstract void onCreate();//实例化数据库，网络请求库，管理器，一类操作
 
